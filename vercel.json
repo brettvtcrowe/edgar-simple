@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "edgar-simple/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/edgar-simple/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/edgar-simple/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "edgar-simple/server.js": {
+      "maxDuration": 30
+    }
+  }
+}
