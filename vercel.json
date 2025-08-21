@@ -12,8 +12,12 @@
       "dest": "/edgar-simple/server.js"
     },
     {
+      "src": "/",
+      "dest": "/edgar-simple/server.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/edgar-simple/$1"
+      "dest": "/edgar-simple/server.js"
     }
   ],
   "env": {
