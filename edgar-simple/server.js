@@ -9,6 +9,16 @@ const { classifySector, getSectorInfo, calculateSectorAnalytics, getAllSectors }
 app.use(express.static('.'));
 app.use(express.json());
 
+// Root route handler
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+// Health check endpoint for Vercel
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Regulatory Intelligence Hub is running' });
+});
+
 // Single endpoint that does everything
 app.post('/api/filings', async (req, res) => {
   try {
