@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Filing Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #error {
+            color: red;
+            margin-top: 10px;
+        }
+        #results {
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #loading {
+            display: none;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SEC Filing Lookup</h1>
+    <p>Enter a stock ticker to get the latest SEC filings with direct links to documents.</p>
+
+    <div>
+        <input 
+            id="ticker" 
+            type="text" 
+            placeholder="Enter ticker (e.g., AAPL)" 
+            onkeypress="if(event.key === 'Enter') getFilings()"
+        />
+        <button id="submitBtn" onclick="getFilings()">Get Filings</button>
+    </div>
+
+    <div id="loading">Loading...</div>
+    <div id="error"></div>
+    <div id="results"></div>
+
+    <script>
+        async function getFilings() {
+            // Get the ticker value
+            const ticker = document.getElementById('ticker').value.trim();
+            if (!ticker) {
+                document.getElementById('error').textContent = 'Please enter a ticker';
+                return;
+            }
+
+            // Clear previous results and errors
+            document.getElementById('error').textContent = '';
+            document.getElementById('results').innerHTML = '';
+
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                // Call our backend API
+                const response = await fetch('/api/filings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ticker })
+                });
+
+                const data = await response.json();
+
+                // Check for errors
+                if (data.error) {
+                    document.getElementById('error').textContent = data.error;
+                    return;
+                }
+
+                // Build the results table
+                let html = `
+                    <h2>${data.company}</h2>
+                    <p>CIK: ${data.cik}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Form Type</th>
+                                <th>Filing Date</th>
+                                <th>Description</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // Add each filing as a row
+                for (const filing of data.filings) {
+                    html += `
+                        <tr>
+                            <td><strong>${filing.form}</strong></td>
+                            <td>${filing.date}</td>
+                            <td>${filing.description}</td>
+                            <td><a href="${filing.url}" target="_blank">View on SEC.gov</a></td>
+                        </tr>
+                    `;
+                }
+
+                html += '</tbody></table>';
+
+                // Display the results
+                document.getElementById('results').innerHTML = html;
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error').textContent = 'Failed to fetch filings. Please try again.';
+            } finally {
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
