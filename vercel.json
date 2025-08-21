@@ -8,19 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/edgar-simple/server.js"
-    },
-    {
-      "src": "/",
-      "dest": "/edgar-simple/server.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "/edgar-simple/server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
