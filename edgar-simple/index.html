@@ -74,11 +74,16 @@
         }
 
         .tab-content {
+            display: none;
             background: white;
             padding: 30px;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 0;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .tab-content:last-child {
@@ -531,18 +536,23 @@
     <script>
         // Tab management
         function showTab(tabName) {
-            // Hide all tab panes
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            tabPanes.forEach(pane => pane.classList.remove('active'));
+            // Hide all tab content divs
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
             
             // Remove active class from all tabs
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => tab.classList.remove('active'));
             
-            // Show selected tab pane
-            document.querySelector(`#${tabName} .tab-pane`).classList.add('active');
+            // Show selected tab content
+            const selectedTab = document.getElementById(tabName);
+            selectedTab.classList.add('active');
+            selectedTab.style.display = 'block';
             
-            // Add active class to selected tab
+            // Add active class to selected tab button
             event.target.classList.add('active');
         }
 
@@ -764,6 +774,12 @@
 
         // Auto-load sectors on tab show
         document.addEventListener('DOMContentLoaded', function() {
+            // Hide all tab contents initially
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
             // Show basic tab by default
             showTab('basic');
         });
